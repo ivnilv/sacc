@@ -24,7 +24,7 @@ The tool will use your AWS access key and secret to request new session token fr
 
 Clone the repository locally:
 ```
-$ 	
+$ git clone https://github.com/ivnilv/sacc.git ~/sacc/
 ```
 Install a link to your `$PATH`:
 ```

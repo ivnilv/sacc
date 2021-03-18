@@ -5,22 +5,22 @@
 
 The tool will use your AWS access key and secret to request new session token from the AWS Security Token Service (AWS STS).
 
-Usage:
+### Usage:
 
 ![usage](./sacc.svg)
 
-Prerequisites:
+### Prerequisites:
 
 - You will need an existing AWS account
 - MFA (Multi-factor authentication) device linked to your account
 - AWS API Access key generated from your account
 
-Requirements:
+### Requirements:
 - bash 3.2+
 - [jq](https://github.com/stedolan/jq)
 - [aws-cli](https://github.com/aws/aws-cli)
 
-Installation:
+### Installation:
 
 Clone the repository locally:
 ```

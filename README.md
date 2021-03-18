@@ -1,6 +1,12 @@
 # SACC 
 **S**mart **A**WS **C**li **C**onfig - `~/.aws/credentials` generator for lazy devs
 
+project homepage: https://blog.ivnilv.com/tools/sacc/
+
+project source code: https://github.com/ivnilv/sacc/
+
+---
+
 `sacc` is a tool built out of the necessity to get new AWS session tokens every 36 (maximum) hours. 
 
 The tool will use your AWS access key and secret to request new session token from the AWS Security Token Service (AWS STS).

@@ -6,7 +6,6 @@
 Usage:
 
 ![usage](./sacc.svg)
-<img src="./sacc.svg">
 
 Requirements:
 - bash 3.2+

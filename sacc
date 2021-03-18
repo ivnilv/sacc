@@ -1,60 +1,93 @@
 #!/usr/bin/env bash
-# Source external bash resources
-. ./spinner.sh
+# sacc: A command-line system information tool written in bash 3.2+.
+# https://github.com/ivnilv/sacc
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2015-2021 Ivan Iliev
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 
 # Variables
-aws=`which aws`
-AWS_CONFIG_G7R_FILE=~/.aws/aws-config-g7r.cfg
-#AWS_CONFIG_FILE=~/.aws/config
+SACC_FILE=~/.aws/sacc-config.cfg
+AWS_REAL_CONFIG_FILE=~/.aws/credentials
+sacc_out="\e[1;43m"
+rest_color="\e[0m"
 
 # Functions
 
-generate_tmp_config_file(){
-    > $AWS_CONFIG_G7R_FILE
-    echo -e "[default]" >> $AWS_CONFIG_G7R_FILE
-    echo -n -e "aws_access_key_id = " >> $AWS_CONFIG_G7R_FILE;  echo -e $aws_acc_key >> $AWS_CONFIG_G7R_FILE
-    echo -n -e "aws_secret_access_key = " >> $AWS_CONFIG_G7R_FILE; echo -e $aws_sec_key >> $AWS_CONFIG_G7R_FILE
+generate_smart_config_file(){
+    > $SACC_FILE
+    echo -e "[default]" >> $SACC_FILE
+    echo -n -e "aws_access_key_id = " >> $SACC_FILE;  echo -e $aws_acc_key >> $SACC_FILE
+    echo -n -e "aws_secret_access_key = " >> $SACC_FILE; echo -e $aws_sec_key >> $SACC_FILE
 }
 
 generate_real_config_file(){
-    > $AWS_CONFIG_G7R_FILE
-    echo -e "[default]" >> $AWS_CONFIG_G7R_FILE
-    echo -n -e "aws_access_key_id = " >> $AWS_CONFIG_G7R_FILE;  echo -e $aws_acc_key >> $AWS_CONFIG_G7R_FILE
-    echo -n -e "aws_secret_access_key = " >> $AWS_CONFIG_G7R_FILE; echo -e $aws_sec_key >> $AWS_CONFIG_G7R_FILE
+    > $AWS_REAL_CONFIG_FILE
+    echo -e "[default]" >> $AWS_REAL_CONFIG_FILE
+    echo -n -e "aws_access_key_id = " >> $AWS_REAL_CONFIG_FILE;  echo -e $real_aws_acc_key >> $AWS_REAL_CONFIG_FILE
+    echo -n -e "aws_secret_access_key = " >> $AWS_REAL_CONFIG_FILE; echo -e $real_aws_sec_key >> $AWS_REAL_CONFIG_FILE
+    echo -n -e "aws_session_token = " >> $AWS_REAL_CONFIG_FILE; echo -e $real_aws_sess_token >> $AWS_REAL_CONFIG_FILE
+}
+
+sacc_out(){
+	echo -e -n "${sacc_out} SACC>${rest_color} ";
 }
 
 # Main
 
-# First let's get your AWS Access Key ID and Access Secret Key. 
-# Those will be used later to request new AWS Access Key ID, Access Secret Key and AWS Session Token. 
-# Session Tokens have a default TTL 43,200 seconds (12 hours). 
+# First let's get your AWS Access Key ID and Access Secret Key.
+# Those will be used later to request new AWS Access Key ID, Access Secret Key and AWS Session Token.
+# Session Tokens have a default TTL 43,200 seconds (12 hours) and maximum of 129,600 seconds (36 hours).
 # You can change that or use the default later in the script.
-echo "Enter your AWS Access Key ID: "  
-read aws_acc_key
+sacc_out; echo "Enter your AWS Access Key ID: "
+echo -n "input: "; read aws_acc_key
 #echo $aws_acc_key
-echo "Enter your AWS Secret Key: "
-read aws_sec_key
+sacc_out; echo "Enter your AWS Secret Key: "
+echo -n "input: "; read aws_sec_key
 # Ask for MFA device ARN number:
-echo "Enter your MFA device number: (Format: arn:aws:iam::123456789123:mfa/user.name)"
-read mfa_arn
+sacc_out; echo "Enter your MFA device number: (Format: arn:aws:iam::123456789123:mfa/user.name)"
+echo -n "input: "; read mfa_arn
 # Write those to ~/.aws/aws-config-g7r.cfg
-AWS_CONFIG_G7R_FILE=~/.aws/aws-config-g7r.cfg
-touch $AWS_CONFIG_G7R_FILE
-chmod 600 $AWS_CONFIG_G7R_FILE
+#AWS_CONFIG_G7R_FILE=~/.aws/aws-config-g7r.cfg
+touch $SACC_FILE
+chmod 600 $SACC_FILE
 
-generate_tmp_config_file
-# Ask for mfa and send a warning to prepare device 
-echo "Next we'll need your MFA code. Please prepare your device and wait for the input prompt!"
-echo ""
-sleep 5
-echo -n "Enter MFA Code here: "
-read mfa_code
+generate_smart_config_file
+# Ask for mfa and send a warning to prepare device
+sacc_out; echo "Next we'll need your MFA code. Please prepare your device and wait for the input prompt!"
+sleep 3
+echo -n "Enter MFA Code here: "; read mfa_code
 #echo -n "MFA code is: "; echo $mfa_code
 
 # Request real credentials to store in real config
 #AWS_CONFIG_FILE=${AWS_CONFIG_G7R_FILE}
-AWS_SHARED_CREDENTIALS_FILE=${AWS_CONFIG_G7R_FILE} `which aws` sts get-session-token --duration-seconds 3600 --serial-number $mfa_arn --token-code $mfa_code
+#AWS_SHARED_CREDENTIALS_FILE=${AWS_CONFIG_G7R_FILE} `which aws` sts get-session-token --duration-seconds 3600 --serial-number $mfa_arn --token-code $mfa_code
+AWS_RESULT=$(AWS_SHARED_CREDENTIALS_FILE=${SACC_FILE} `which aws` sts get-session-token --duration-seconds 129600 --serial-number $mfa_arn --token-code $mfa_code)
+real_aws_acc_key=$(echo $AWS_RESULT | jq -r '.Credentials.AccessKeyId')
+real_aws_sec_key=$(echo $AWS_RESULT | jq -r '.Credentials.SecretAccessKey')
+real_aws_sess_token=$(echo $AWS_RESULT | jq -r '.Credentials.SessionToken')
+token_expiration=$(echo $AWS_RESULT | jq -r '.Credentials.Expiration')
+
+generate_real_config_file
+sacc_out; echo -n "Done! AWS credentials stored in "; echo -n $AWS_REAL_CONFIG_FILE ; echo -n " and are valid until "; echo $token_expiration
+# TODO: check the Expiration as well and write it down. Next run of the script should compare the current date against the written down date and not generate new credentials
 #AWS_SHARED_CREDENTIALS_FILE=${AWS_CONFIG_G7R_FILE} export mfa_arn=${mfa_arn} ; export mfa_code=${mfa_code} ; bash -c '/usr/local/bin/aws sts get-session-token --duration-seconds 3600 --serial-number $mfa_arn --token-code $mfa_code'
-
-
-

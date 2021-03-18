@@ -1,2 +1,8 @@
-# Smart-AWS-Config
-Smart AWS Config Generator for lazy devs
+# SACC 
+Smart AWS Cli Config - Generator for lazy devs
+
+Requirements:
+
+- jq
+- bash
+- aws (cli)

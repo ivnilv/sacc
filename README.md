@@ -19,3 +19,14 @@ Requirements:
 - bash 3.2+
 - [jq](https://github.com/stedolan/jq)
 - [aws-cli](https://github.com/aws/aws-cli)
+
+Installation:
+
+Clone the repository locally:
+```
+$ 	
+```
+Install a link to your `$PATH`:
+```
+$ sudo ln -s ~/sacc/sacc /usr/local/bin/
+```

@@ -1,8 +1,7 @@
 # SACC 
-Smart AWS Cli Config - Generator for lazy devs
+Smart AWS Cli Config - `~/.aws/credentials` generator for lazy devs
 
 Requirements:
-
-- jq
-- bash
-- aws (cli)
+- bash 3.2+
+- [jq](https://github.com/stedolan/jq)
+- [aws-cli](https://github.com/aws/aws-cli)

@@ -1,5 +1,5 @@
 # SACC 
-*S*mart *A*WS *C*li *C*onfig - `~/.aws/credentials` generator for lazy devs
+**S**mart **A**WS **C**li **C**onfig - `~/.aws/credentials` generator for lazy devs
 
 `sacc` is a tool built out of the necessity 
 

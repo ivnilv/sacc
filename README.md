@@ -3,9 +3,17 @@
 
 `sacc` is a tool built out of the necessity to get new AWS session tokens every 36 (maximum) hours. 
 
+The tool will use your AWS access key and secret to request new session token from the AWS Security Token Service (AWS STS).
+
 Usage:
 
 ![usage](./sacc.svg)
+
+Prerequisites:
+
+- You will need an existing AWS account
+- MFA (Multi-factor authentication) device linked to your account
+- AWS API Access key generated from your account
 
 Requirements:
 - bash 3.2+
